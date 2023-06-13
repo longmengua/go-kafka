@@ -113,6 +113,4 @@ Git hooks。
 - kafka docker setup
     - https://www.baeldung.com/ops/kafka-docker-setup
 - segmentio/kafka-go
-    - 
-- kafka sarama
-    - https://www.lixueduan.com/posts/kafka/05-quick-start/
+    - https://github.com/segmentio/kafka-go
