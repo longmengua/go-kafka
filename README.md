@@ -108,5 +108,11 @@ Git hooks。
 
 ## reference
 
-- https://www.baeldung.com/ops/kafka-docker-setup
-- https://github.com/golang-standards/project-layout/blob/master/README_zh-TW.md
+- folder structure
+    - https://github.com/golang-standards/project-layout/blob/master/README_zh-TW.md
+- kafka docker setup
+    - https://www.baeldung.com/ops/kafka-docker-setup
+- segmentio/kafka-go
+    - 
+- kafka sarama
+    - https://www.lixueduan.com/posts/kafka/05-quick-start/

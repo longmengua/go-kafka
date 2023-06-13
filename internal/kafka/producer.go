@@ -2,47 +2,36 @@ package kafka
 
 import (
 	"context"
-	"fmt"
-	"strconv"
+	"log"
 	"time"
 
 	"github.com/segmentio/kafka-go"
 )
 
-const (
-	topic          = "message-log"
-	broker1Address = "localhost:9093"
-	broker2Address = "localhost:9094"
-	broker3Address = "localhost:9095"
-)
-
-func Producer(ctx context.Context) {
-	// initialize a counter
-	i := 0
-
-	// intialize the writer with the broker addresses, and the topic
-	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers: []string{broker1Address, broker2Address, broker3Address},
-		Topic:   topic,
-	})
-
+func Producer() {
 	for {
-		// each kafka message has a key and value. The key is used
-		// to decide which partition (and consequently, which broker)
-		// the message gets published on
-		err := w.WriteMessages(ctx, kafka.Message{
-			Key: []byte(strconv.Itoa(i)),
-			// create an arbitrary message payload for the value
-			Value: []byte("this is message" + strconv.Itoa(i)),
-		})
-		if err != nil {
-			panic("could not write message " + err.Error())
+		w := &kafka.Writer{
+			Addr:                   kafka.TCP("localhost:29092", "localhost:39092"),
+			Topic:                  "topic-A",
+			Balancer:               &kafka.LeastBytes{},
+			AllowAutoTopicCreation: true,
 		}
 
-		// log a confirmation once the message is written
-		fmt.Println("writes:", i)
-		i++
-		// sleep for a second
-		time.Sleep(time.Second)
+		err := w.WriteMessages(
+			context.Background(),
+			kafka.Message{
+				// Partition: 0,
+				Key:   []byte("Key"),
+				Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
+			},
+		)
+		if err != nil {
+			log.Fatal("failed to write messages:", err)
+		}
+
+		if err := w.Close(); err != nil {
+			log.Fatal("failed to close writer:", err)
+		}
+		time.Sleep(1 * time.Second)
 	}
 }

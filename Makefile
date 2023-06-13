@@ -1,6 +1,6 @@
 # db
 kafka:
-	docker-compose up -d
+	docker-compose -f ./devOps/docker-compose.yml up -d
 
 kafka-log:
 	docker-compose logs kafka | grep -i started	

@@ -3,26 +3,29 @@ package kafka
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/segmentio/kafka-go"
 )
 
-func Consumer(ctx context.Context) {
-	// initialize a new reader with the brokers and topic
-	// the groupID identifies the consumer and prevents
-	// it from receiving duplicate messages
+func Consumer() {
+	// make a new reader that consumes from topic-A
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{broker1Address, broker2Address, broker3Address},
-		Topic:   topic,
-		GroupID: "my-group",
+		Brokers:  []string{"localhost:29092", "localhost:39092"},
+		GroupID:  "consumer-group-id",
+		Topic:    "topic-A",
+		MaxBytes: 10e6, // 10MB
 	})
+
 	for {
-		// the `ReadMessage` method blocks until we receive the next event
-		msg, err := r.ReadMessage(ctx)
+		m, err := r.ReadMessage(context.Background())
 		if err != nil {
-			panic("could not read message " + err.Error())
+			break
 		}
-		// after receiving the message, log its value
-		fmt.Println("received: ", string(msg.Value))
+		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+	}
+
+	if err := r.Close(); err != nil {
+		log.Fatal("failed to close reader:", err)
 	}
 }
