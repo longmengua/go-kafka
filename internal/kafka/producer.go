@@ -38,8 +38,8 @@ func NewProducer(
 ) Producer {
 	p := Producer{}
 	p.Config = kafka.WriterConfig{
-		Brokers: []string{"localhost:9092"},
-		Topic:   "test-topic",
+		Brokers: Addresses,
+		Topic:   Topic,
 	}
 	return p
 }
