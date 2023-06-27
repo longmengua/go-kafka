@@ -15,7 +15,6 @@ func main() {
 	c := kafka.NewConsumer(urls, groupId, topic)
 
 	go func() {
-		p.ProduceMsg()
 		p.PublishMsg()
 	}()
 

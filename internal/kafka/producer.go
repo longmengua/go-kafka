@@ -10,23 +10,19 @@ import (
 
 type Producer struct {
 	Config kafka.WriterConfig
-	Msg    kafka.Message
-}
-
-func (p *Producer) ProduceMsg() {
-	p.Msg = kafka.Message{
-		// Partition: 0,
-		Key:   []byte("Key"),
-		Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
-	}
 }
 
 func (p *Producer) PublishMsg() {
 	writer := kafka.NewWriter(p.Config)
 	defer writer.Close()
 	for {
+		msg := kafka.Message{
+			// Partition: 0,
+			Key:   []byte("Key"),
+			Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
+		}
 		// Write the message to Kafka
-		err := writer.WriteMessages(context.Background(), p.Msg)
+		err := writer.WriteMessages(context.Background(), msg)
 		if err != nil {
 			log.Fatal("Failed to write message: ", err)
 		}
