@@ -29,6 +29,7 @@ func (p *Producer) PublishMsg() {
 		if err != nil {
 			log.Fatal("Failed to write message: ", err)
 		}
+		time.Sleep(1 * time.Second)
 	}
 }
 

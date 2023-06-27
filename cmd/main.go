@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-kafka/internal/kafka"
+	"go-kafka/tools"
 )
 
 func main() {
@@ -11,15 +12,11 @@ func main() {
 	topic := "topic"
 
 	p := kafka.NewProducer(urls, topic)
-	go func() {
-		p.PublishMsg()
-	}()
+	tools.Async(p.PublishMsg)
 
 	groupId := "group"
 	c := kafka.NewConsumer(urls, groupId, topic)
-	go func() {
-		c.SubscribeMsg()
-	}()
+	tools.Async(c.SubscribeMsg)
 
 	fmt.Printf("End %s", <-ch)
 }
