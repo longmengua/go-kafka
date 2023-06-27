@@ -15,6 +15,9 @@ type Producer struct {
 func (p *Producer) PublishMsg() {
 	writer := kafka.NewWriter(p.Config)
 	defer writer.Close()
+
+	log.Panicln("Start Publish")
+
 	for {
 		msg := kafka.Message{
 			// Partition: 0,

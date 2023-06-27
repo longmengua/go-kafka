@@ -31,6 +31,8 @@ func (c *Consumer) SubscribeMsg() {
 	reader := kafka.NewReader(c.config)
 	defer reader.Close()
 
+	log.Panicln("Start Subscribe")
+
 	for {
 		// Read a single message from Kafka
 		message, err := reader.FetchMessage(context.Background())
