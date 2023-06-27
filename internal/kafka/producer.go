@@ -16,7 +16,7 @@ func (p *Producer) PublishMsg() {
 	writer := kafka.NewWriter(p.Config)
 	defer writer.Close()
 
-	log.Panicln("Start Publish")
+	log.Println("Start Publish")
 
 	for {
 		msg := kafka.Message{
