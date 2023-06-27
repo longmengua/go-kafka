@@ -8,30 +8,39 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func Producer() {
-	for {
-		w := &kafka.Writer{
-			Addr:                   kafka.TCP("localhost:29092", "localhost:39092"),
-			Topic:                  "topic-A",
-			Balancer:               &kafka.LeastBytes{},
-			AllowAutoTopicCreation: true,
-		}
+type Producer struct {
+	Config kafka.WriterConfig
+	Msg    kafka.Message
+}
 
-		err := w.WriteMessages(
-			context.Background(),
-			kafka.Message{
-				// Partition: 0,
-				Key:   []byte("Key"),
-				Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
-			},
-		)
-		if err != nil {
-			log.Fatal("failed to write messages:", err)
-		}
-
-		if err := w.Close(); err != nil {
-			log.Fatal("failed to close writer:", err)
-		}
-		time.Sleep(1 * time.Second)
+func (p *Producer) ProduceMsg() {
+	p.Msg = kafka.Message{
+		// Partition: 0,
+		Key:   []byte("Key"),
+		Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
 	}
+}
+
+func (p *Producer) PublishMsg() {
+	writer := kafka.NewWriter(p.Config)
+	defer writer.Close()
+	for {
+		// Write the message to Kafka
+		err := writer.WriteMessages(context.Background(), p.Msg)
+		if err != nil {
+			log.Fatal("Failed to write message: ", err)
+		}
+	}
+}
+
+func NewProducer(
+	Addresses []string,
+	Topic string,
+) Producer {
+	p := Producer{}
+	p.Config = kafka.WriterConfig{
+		Brokers: []string{"localhost:9092"},
+		Topic:   "test-topic",
+	}
+	return p
 }

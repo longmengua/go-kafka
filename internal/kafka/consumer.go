@@ -8,24 +8,46 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func Consumer() {
-	// make a new reader that consumes from topic-A
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{"localhost:29092", "localhost:39092"},
-		GroupID:  "consumer-group-id",
-		Topic:    "topic-A",
-		MaxBytes: 10e6, // 10MB
-	})
+type Consumer struct {
+	config kafka.ReaderConfig
+}
 
-	for {
-		m, err := r.ReadMessage(context.Background())
-		if err != nil {
-			break
-		}
-		fmt.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+func NewConsumer(
+	brokers []string,
+	groupID string,
+	topic string,
+) Consumer {
+	c := Consumer{}
+	c.config = kafka.ReaderConfig{
+		Brokers: brokers,
+		GroupID: groupID,
+		Topic:   topic,
 	}
 
-	if err := r.Close(); err != nil {
-		log.Fatal("failed to close reader:", err)
+	return c
+}
+
+func (c *Consumer) SubscribeMsg() {
+	reader := kafka.NewReader(c.config)
+	defer reader.Close()
+
+	for {
+		// Read a single message from Kafka
+		message, err := reader.FetchMessage(context.Background())
+		if err != nil {
+			log.Fatal("Failed to fetch message: ", err)
+		}
+
+		// Print the received message
+		fmt.Printf("Received message: Key = %s, Value = %s\n", string(message.Key), string(message.Value))
+
+		// Process the message
+		// ...
+
+		// Mark the message as processed
+		err = reader.CommitMessages(context.Background(), message)
+		if err != nil {
+			log.Fatal("Failed to commit message: ", err)
+		}
 	}
 }

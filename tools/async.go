@@ -1,6 +1,8 @@
 package tools
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Async(goFunc func()) {
 	go func() {

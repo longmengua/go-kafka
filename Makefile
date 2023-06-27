@@ -10,7 +10,7 @@ run:
 	go run cmd/main.go
 
 # test
-test:
+t:
 	go test -v ./... -bench=.
 	
 # show help
