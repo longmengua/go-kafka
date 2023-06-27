@@ -11,10 +11,10 @@ func main() {
 	groupId := "group"
 	topic := "topic"
 
-	// p := kafka.NewProducer(urls, topic)
-	// go func() {
-	// 	p.PublishMsg()
-	// }()
+	p := kafka.NewProducer(urls, topic)
+	go func() {
+		p.PublishMsg()
+	}()
 
 	c := kafka.NewConsumer(urls, groupId, topic)
 	go func() {
