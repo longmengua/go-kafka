@@ -13,23 +13,33 @@ type Producer struct {
 }
 
 func (p *Producer) PublishMsg() {
-	writer := kafka.NewWriter(p.Config)
-	defer writer.Close()
+	w := &kafka.Writer{
+		Addr:                   kafka.TCP(p.Config.Brokers...),
+		Topic:                  p.Config.Topic,
+		Balancer:               &kafka.LeastBytes{},
+		AllowAutoTopicCreation: true,
+	}
 
-	log.Println("Start Publish")
+	defer func() {
+		if err := w.Close(); err != nil {
+			log.Fatal("failed to close writer:", err)
+		}
+	}()
 
 	for {
-		msg := kafka.Message{
-			// Partition: 0,
-			Key:   []byte("Key"),
-			Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
-		}
-		// Write the message to Kafka
-		err := writer.WriteMessages(context.Background(), msg)
+		err := w.WriteMessages(
+			context.Background(),
+			kafka.Message{
+				// Partition: 0,
+				Key:   []byte("Key"),
+				Value: []byte("Hello World! " + time.Now().Format(time.RFC3339)),
+			},
+		)
 		if err != nil {
-			log.Fatal("Failed to write message: ", err)
+			log.Fatal("failed to write messages:", err)
 		}
-		time.Sleep(1 * time.Second)
+		log.Println("write messages ok")
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 
